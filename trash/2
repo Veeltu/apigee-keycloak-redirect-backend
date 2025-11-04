@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="AM-ValidationSuccessMock">
+  <AssignTo createNew="false" transport="http" type="response"/>
+  <Set>
+    <Headers>
+      <Header name="Content-Type">application/json</Header>
+    </Headers>
+    <Payload>
+    {
+        "status": "success",
+        "message": "Token is valid (Verified in Proxy Flow), returning mock success response.",
+        "verified_token_payload": "{{request.header.Authorization}}"
+    }
+    </Payload>
+  </Set>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>
+
+
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="ReturnTokenWithInfo">
+  <AssignTo createNew="false" transport="http" type="response"/>
+  <Set>
+    <Headers>
+      <Header name="Content-Type">application/json</Header>
+    </Headers>
+    <Payload>
+      {
+        "success": true,
+        "timestamp": "{system.timestamp}",
+        "client_ip": "{request.header.x-forwarded-for}",
+        "token_response": {tokenResponse.content}
+      }
+    </Payload>
+  </Set>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>
