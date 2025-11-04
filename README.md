@@ -57,5 +57,37 @@ Example `Location` header (excerpt):
 - Double slash in redirect (`//keycloak-test/login`): remove the trailing `/` from `APIGEE_URL` or ensure the app trims it.
 - 404 after login: verify `Valid Redirect URIs` in Keycloak and `redirect_uri` in Apigee — both must target the Cloud Run service `/callback`.
 
+### Apigee proxy configuration (included)
+This repo includes an Apigee proxy bundle you can import and deploy:
+
+- File: `apigee-proxy/keycloak-test_rev55_2025_11_04.zip`
+- Intended proxy name: `keycloak-test` (you can keep or rename during import)
+
+Install via Apigee UI (recommended):
+1. In Apigee UI, go to `Develop → API Proxies` and click `+Proxy` → `Upload proxy` (or `Import` in classic UI).
+2. Select the zip file: `apigee-proxy/keycloak-test_rev55_2025_11_04.zip` and import.
+3. Open the imported proxy (`keycloak-test`), review policies (e.g., `AM-login-keycloack.xml`) and update `redirect_uri` to your Cloud Run `/callback` URL if needed.
+4. Click `Deploy` and choose environment (e.g., `test`).
+
+Optional CLI (apigeecli):
+```bash
+# Install: https://github.com/apigee/apigeecli
+apigeecli apis import \
+  --org $APIGEE_ORG \
+  --name keycloak-test \
+  --file apigee-proxy/keycloak-test_rev55_2025_11_04.zip
+
+# Deploy latest revision to an environment, e.g., test
+REV=$(apigeecli apis list --org $APIGEE_ORG --name keycloak-test --format json | jq -r '.proxies[0].revision[-1]')
+apigeecli apis deploy \
+  --org $APIGEE_ORG \
+  --env $APIGEE_ENV \
+  --name keycloak-test \
+  --rev $REV \
+  --ovr --wait
+```
+
+After deploying the proxy, ensure the redirect points to your Cloud Run `/callback` and that the Keycloak client `Valid Redirect URIs` includes that URL.
+
 ### Changelog
-- 2025-11-04: Expanded README with `APIGEE_URL` config, local/Docker/Cloud Run instructions, and integration notes. 
+- 2025-11-04: Expanded README with `APIGEE_URL` config, local/Docker/Cloud Run instructions, integration notes, and Apigee proxy install steps. 
